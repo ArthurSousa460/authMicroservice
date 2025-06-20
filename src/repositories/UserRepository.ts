@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client/extension";
-import { Roles } from "../../prisma/generated/prisma/index.js";
+import { PrismaClient } from "@prisma/client";
 
 class UserRepository{
 
@@ -10,18 +9,17 @@ class UserRepository{
     }
 
     async findEmail(email: string){
-        const findEmail = await this.prismaClient.User.findUnique({
+        const findEmail = await this.prismaClient.user.findUnique({
             where: {
                 email: email
             }
         })
-        if (!findEmail){
-            throw new Error("Email not find")
-        } 
+
+        return findEmail;
     }
 
 
-    async create(name: String, email: String, password: String, role: Roles){
+    async create(name: string, email: string, password: string, role: any){
         const newUser = await this.prismaClient.user.create({
             data:{
                 name,
@@ -39,9 +37,28 @@ class UserRepository{
         }
     }
 
-    async update(id: number, name?: string, email?: String, password?: String, role?: Roles){
-        return this.prismaClient.update(
-
+    async update(id: number, name?: string, email?: string, password?: string, role?: any){
+        return await this.prismaClient.user.update(
+            {
+                where: {
+                    id: id
+                },
+                data: {
+                    name,
+                    email,
+                    password,
+                    role
+                }
+            }
+        )
+    }
+    async delete(id: number){
+        return this.prismaClient.user.delete(
+            {
+                where: {
+                    id: id
+                }
+            }
         )
     }
 }

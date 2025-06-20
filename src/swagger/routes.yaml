@@ -1,0 +1,94 @@
+tags:
+  - name: General
+    description: Rotas gerais
+  - name: Users
+    description: Operações de usuário
+  - name: Authentication
+    description: Autenticação de usuário
+
+paths:
+  /:
+    get:
+      summary: Página inicial da API
+      description: Retorna uma mensagem de boas-vindas.
+      tags: [General]
+      responses:
+        '200':
+          description: Mensagem de boas-vindas.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Welcome to the api"
+  
+  /user/register:
+    post:
+      summary: Registrar um novo usuário
+      description: Cria uma nova conta de usuário.
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                password:
+                  type: string
+                  example: "password123"
+                role:
+                  type: string
+                  enum: [USER, ADMIN]
+                  example: "USER"
+              required:
+                - name
+                - email
+                - password
+                - role
+      responses:
+        '201':
+          description: Usuário criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Erro na requisição.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /login:
+    post:
+      summary: Realizar login
+      description: Autentica um usuário e retorna um token de acesso.
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthSchema'
+      responses:
+        '200':
+          description: Login bem-sucedido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+        '400':
+          description: Credenciais inválidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 
