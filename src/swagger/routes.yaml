@@ -91,4 +91,29 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Error'
+
+  /route-protected:
+    get:
+      summary: Rota protegida por autenticação
+      description: Retorna uma mensagem de sucesso se o usuário estiver autenticado.
+      tags: [General]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Acesso autorizado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Route protected"
+        '401':
+          description: Não autorizado. Token não fornecido ou inválido.
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/Error' 

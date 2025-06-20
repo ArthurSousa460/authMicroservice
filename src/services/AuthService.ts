@@ -22,7 +22,7 @@ export default class AuthService{
         }, this.secretKey, {expiresIn: "1h"})
     }
 
-    verifyToken(token: string): UserPayload{
+    async verifyToken(token: string): Promise<UserPayload>{
         try{
             const payload = jwt.verify(token, this.secretKey);
              const { id, name, email, role } = payload as JwtPayload;

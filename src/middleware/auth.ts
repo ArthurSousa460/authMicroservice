@@ -1,6 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import AuthService from "../services/AuthService.js";
 import { UserPayload } from "../index.js";
+import { AuthorizationService } from "../services/AutorizationService.js";
 
 declare global {
   namespace Express {
@@ -12,7 +13,7 @@ declare global {
 
 const authService = new AuthService();
 
-export function authenticate(req: Request, res: Response, next: NextFunction){
+export async function authenticate(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) return res.status(401).json({message: "No token provided"});
@@ -25,12 +26,21 @@ export function authenticate(req: Request, res: Response, next: NextFunction){
     if (!/^Bearer$/i.test(scheme)) return res.status(401).json({message: "Token malformatted"});
 
     try{
-        const decoded = authService.verifyToken(token);
+        const decoded =  await authService.verifyToken(token);
         req.user = decoded;
         return next();
     }catch(error){
         return res.status(401).json({message: "Token invalid"});
     }
 
+}
 
+export function authorize(authorizedRoles: string[]) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        const user = req.user;
+        const authorizationService = new AuthorizationService();
+        if(!user) return res.status(401).json({message: "Unauthorized"});
+        if(!authorizationService.isAuthorized(user, authorizedRoles)) return res.status(403).json({message: "Forbidden"});
+        return next();
+    }
 }

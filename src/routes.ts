@@ -1,6 +1,7 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, RequestHandler } from "express";
 import UserController from "./controllers/UserController.js";
 import AuthController from "./controllers/AuthController.js";
+import { authenticate, authorize } from "./middleware/auth.js";
 
 
 
@@ -15,8 +16,8 @@ router.get("/", (req:Request, res:Response) =>{
 
 router.post("/user/register", async (req: Request, res: Response) => {userController.register(req, res)});
 router.post("/login", async (req: Request, res: Response) => {authController.login(req, res)});
-
-
-
+router.get("/route-protected", authenticate as RequestHandler, authorize(["ADMIN"]) as RequestHandler, async (req: Request, res: Response) => {
+    res.status(200).json({message: "Route protected"});
+});
 
 export default router;
